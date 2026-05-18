@@ -116,7 +116,7 @@ stellar contract invoke \
   --source-account <YOUR_KEY> \
   --network testnet \
   -- seal_entry \
-  --author <YOUR_ADDRESS> \
+  --author dinaamelia \
   --title "My 2025 Resolution" \
   --content "Run a marathon by December" \
   --unlock_at 1767225600 \
