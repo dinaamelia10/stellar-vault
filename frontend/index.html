@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stellar Vault</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #12121a;
+      --bg3: #1a1a26;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.15);
+      --text: #f0f0f8;
+      --text2: #8888aa;
+      --text3: #5555778;
+      --accent: #7c6af7;
+      --accent2: #5548d9;
+      --gold: #f5c842;
+      --red: #f05252;
+      --green: #34c98a;
+      --teal: #2dd4bf;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      background: rgba(10,10,15,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--teal));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .contract-badge {
+      font-size: 11px;
+      color: var(--text2);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .contract-badge:hover { border-color: var(--border2); }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* ── STATS ROW ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+    }
+
+    .stat-value.purple { color: var(--accent); }
+    .stat-value.gold { color: var(--gold); }
+    .stat-value.green { color: var(--green); }
+    .stat-value.teal { color: var(--teal); }
+
+    /* ── MAIN GRID ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    /* ── FORM PANEL ── */
+    .panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="datetime-local"],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    select option { background: var(--bg3); }
+
+    /* priority selector */
+    .priority-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .priority-btn {
+      padding: 8px 4px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text2);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .priority-btn:hover { border-color: var(--border2); color: var(--text); }
+    .priority-btn.active-low    { border-color: var(--green); color: var(--green); background: rgba(52,201,138,0.08); }
+    .priority-btn.active-medium { border-color: var(--teal); color: var(--teal); background: rgba(45,212,191,0.08); }
+    .priority-btn.active-high   { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,0.08); }
+    .priority-btn.active-critical { border-color: var(--red); color: var(--red); background: rgba(240,82,82,0.08); }
+
+    .btn-seal {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: opacity 0.2s, transform 0.1s;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-seal:hover { opacity: 0.9; }
+    .btn-seal:active { transform: scale(0.98); }
+    .btn-seal:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── VAULT LIST ── */
+    .vault-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-chip.active, .filter-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(124,106,247,0.1);
+    }
+
+    /* ── ENTRY CARD ── */
+    .entry-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 10px;
+      transition: border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .entry-card:hover { border-color: var(--border2); }
+
+    .entry-card.locked::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+    }
+
+    .entry-card.revealed::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--green), transparent);
+    }
+
+    .entry-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .entry-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+
+    .entry-badges {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-locked   { background: rgba(245,200,66,0.12); color: var(--gold); border: 1px solid rgba(245,200,66,0.25); }
+    .badge-revealed { background: rgba(52,201,138,0.12); color: var(--green); border: 1px solid rgba(52,201,138,0.25); }
+    .badge-low      { background: rgba(52,201,138,0.1); color: var(--green); border: 1px solid rgba(52,201,138,0.2); }
+    .badge-medium   { background: rgba(45,212,191,0.1); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+    .badge-high     { background: rgba(245,200,66,0.1); color: var(--gold); border: 1px solid rgba(245,200,66,0.2); }
+    .badge-critical { background: rgba(240,82,82,0.1); color: var(--red); border: 1px solid rgba(240,82,82,0.2); }
+
+    .entry-content {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .entry-content.blurred {
+      filter: blur(5px);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .locked-msg {
+      font-size: 12px;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .entry-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .entry-meta-left {
+      display: flex;
+      gap: 14px;
+      font-size: 11px;
+      color: var(--text2);
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tag-pill {
+      background: rgba(124,106,247,0.12);
+      color: var(--accent);
+      border: 1px solid rgba(124,106,247,0.2);
+      border-radius: 20px;
+      padding: 2px 9px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .btn-delete {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-delete:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(240,82,82,0.08);
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text2);
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.4;
+    }
+
+    .empty-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .empty-desc {
+      font-size: 13px;
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      font-size: 13px;
+      color: var(--text);
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.25s;
+      pointer-events: none;
+      max-width: 300px;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #toast.success { border-color: rgba(52,201,138,0.4); color: var(--green); }
+    #toast.error   { border-color: rgba(240,82,82,0.4); color: var(--red); }
+
+    /* ── MODAL ── */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-bg.show { display: flex; }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .modal h3 { font-size: 16px; margin-bottom: 8px; }
+    .modal p { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; line-height: 1.6; }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-confirm {
+      background: var(--red);
+      border: none;
+      color: white;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    @media (max-width: 768px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      header { padding: 0 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🔐</div>
+    Stellar Vault
+  </div>
+  <div class="contract-badge" onclick="copyContract()" title="Click to copy">
+    CANDB6...ANQGYF
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Total Entries</div>
+      <div class="stat-value purple" id="stat-total">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Locked</div>
+      <div class="stat-value gold" id="stat-locked">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Revealed</div>
+      <div class="stat-value green" id="stat-revealed">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Network</div>
+      <div class="stat-value teal" style="font-size:1rem; padding-top:4px;">Testnet</div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+
+    <!-- FORM PANEL -->
+    <div class="panel">
+      <div class="panel-title">
+        <span class="dot"></span>
+        Seal New Entry
+      </div>
+
+      <div class="form-group">
+        <label>Your Stellar Address</label>
+        <input type="text" id="f-author" placeholder="G... (your public key)" />
+      </div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="f-title" placeholder="e.g. My 2025 Resolution" />
+      </div>
+
+      <div class="form-group">
+        <label>Content</label>
+        <textarea id="f-content" placeholder="Write your note here..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Unlock Date (leave empty = instant)</label>
+        <input type="datetime-local" id="f-unlock" />
+      </div>
+
+      <div class="form-group">
+        <label>Priority</label>
+        <div class="priority-grid">
+          <div class="priority-btn active-low" data-p="Low" onclick="selectPriority(this)">Low</div>
+          <div class="priority-btn" data-p="Medium" onclick="selectPriority(this)">Med</div>
+          <div class="priority-btn" data-p="High" onclick="selectPriority(this)">High</div>
+          <div class="priority-btn" data-p="Critical" onclick="selectPriority(this)">Crit</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Tag</label>
+        <input type="text" id="f-tag" placeholder="e.g. personal, work, legal" />
+      </div>
+
+      <button class="btn-seal" id="btn-seal" onclick="sealEntry()">
+        🔒 Seal Entry to Blockchain
+      </button>
+
+      <p style="font-size:11px; color:var(--text2); margin-top:10px; line-height:1.6;">
+        Note: Interact directly via Stellar CLI or Stellar Lab. This UI shows your locally saved vault entries.
+      </p>
+    </div>
+
+    <!-- VAULT LIST -->
+    <div>
+      <div class="vault-header">
+        <div class="panel-title" style="margin:0">
+          <span class="dot"></span>
+          Vault Entries
+        </div>
+        <div class="filter-row">
+          <div class="filter-chip active" data-f="all" onclick="setFilter(this)">All</div>
+          <div class="filter-chip" data-f="locked" onclick="setFilter(this)">🔒 Locked</div>
+          <div class="filter-chip" data-f="revealed" onclick="setFilter(this)">✅ Revealed</div>
+        </div>
+      </div>
+
+      <div id="vault-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-bg" id="delete-modal">
+  <div class="modal">
+    <h3>Destroy Entry</h3>
+    <p>This will permanently remove this entry from the vault. This action cannot be undone on the blockchain.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmDelete()">Destroy</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+  const CONTRACT = 'CANDB6CSCXMHMDOMCEVOIMO4OLACOSZWRKKKJVTD3KW4OBWRJ4ANQGYF';
+  const STORAGE_KEY = 'stellar_vault_entries';
+  let selectedPriority = 'Low';
+  let currentFilter = 'all';
+  let deleteTarget = null;
+
+  // ── DATA (localStorage for demo; real app would call Stellar RPC) ──
+  function loadEntries() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function saveEntries(entries) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
+
+  // ── PRIORITY SELECTOR ──
+  function selectPriority(el) {
+    document.querySelectorAll('.priority-btn').forEach(b => {
+      b.className = 'priority-btn';
+    });
+    selectedPriority = el.dataset.p;
+    el.classList.add('active-' + selectedPriority.toLowerCase());
+  }
+
+  // ── FILTER ──
+  function setFilter(el) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    currentFilter = el.dataset.f;
+    renderVault();
+  }
+
+  // ── SEAL ENTRY ──
+  function sealEntry() {
+    const author  = document.getElementById('f-author').value.trim();
+    const title   = document.getElementById('f-title').value.trim();
+    const content = document.getElementById('f-content').value.trim();
+    const unlockDT = document.getElementById('f-unlock').value;
+    const tag     = document.getElementById('f-tag').value.trim() || 'general';
+
+    if (!author || !title || !content) {
+      showToast('Please fill in address, title, and content.', 'error');
+      return;
+    }
+
+    const unlockAt = unlockDT ? Math.floor(new Date(unlockDT).getTime() / 1000) : 0;
+    const now = Math.floor(Date.now() / 1000);
+
+    const entry = {
+      id: Date.now(),
+      title,
+      content,
+      author,
+      created_at: now,
+      unlock_at: unlockAt,
+      priority: selectedPriority,
+      tag,
+      is_revealed: unlockAt === 0 || now >= unlockAt,
+    };
+
+    const entries = loadEntries();
+    entries.unshift(entry);
+    saveEntries(entries);
+
+    // Reset form
+    document.getElementById('f-title').value = '';
+    document.getElementById('f-content').value = '';
+    document.getElementById('f-unlock').value = '';
+    document.getElementById('f-tag').value = '';
+
+    showToast('Entry sealed to vault! 🔐', 'success');
+    renderVault();
+    updateStats();
+
+    // Show CLI command
+    const unlockArg = unlockAt || 0;
+    console.log(`\nStellar CLI command to seal this entry:\nstellar contract invoke \\\n  --id ${CONTRACT} \\\n  --source-account <YOUR_KEY> \\\n  --network testnet \\\n  -- seal_entry \\\n  --author ${author} \\\n  --title "${title}" \\\n  --content "${content}" \\\n  --unlock_at ${unlockArg} \\\n  --priority ${selectedPriority} \\\n  --tag "${tag}"`);
+  }
+
+  // ── DELETE ──
+  function askDelete(id) {
+    deleteTarget = id;
+    document.getElementById('delete-modal').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('delete-modal').classList.remove('show');
+    deleteTarget = null;
+  }
+
+  function confirmDelete() {
+    if (!deleteTarget) return;
+    const entries = loadEntries().filter(e => e.id !== deleteTarget);
+    saveEntries(entries);
+    closeModal();
+    showToast('Entry destroyed.', 'success');
+    renderVault();
+    updateStats();
+  }
+
+  // ── RENDER ──
+  function renderVault() {
+    const now = Math.floor(Date.now() / 1000);
+    let entries = loadEntries();
+
+    // Auto-reveal if time passed
+    entries = entries.map(e => ({
+      ...e,
+      is_revealed: e.unlock_at === 0 || now >= e.unlock_at
+    }));
+    saveEntries(entries);
+
+    const filtered = entries.filter(e => {
+      if (currentFilter === 'locked')   return !e.is_revealed;
+      if (currentFilter === 'revealed') return e.is_revealed;
+      return true;
+    });
+
+    const list = document.getElementById('vault-list');
+
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🗄️</div>
+          <div class="empty-title">${currentFilter === 'all' ? 'Vault is empty' : 'No ' + currentFilter + ' entries'}</div>
+          <div class="empty-desc">${currentFilter === 'all' ? 'Seal your first entry using the form.' : 'Try a different filter.'}</div>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(e => {
+      const createdDate = new Date(e.created_at * 1000).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'});
+      const unlockDate  = e.unlock_at ? new Date(e.unlock_at * 1000).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'}) : null;
+      const addrShort   = e.author ? e.author.slice(0,6) + '...' + e.author.slice(-4) : '—';
+      const pClass      = 'badge badge-' + e.priority.toLowerCase();
+
+      const lockedMsg = !e.is_revealed && unlockDate
+        ? `<div class="locked-msg">🔒 Unlocks on ${unlockDate}</div>`
+        : '';
+
+      const contentEl = e.is_revealed
+        ? `<div class="entry-content">${escHtml(e.content)}</div>`
+        : `<div class="entry-content blurred">████████████████████████████</div>${lockedMsg}`;
+
+      return `
+        <div class="entry-card ${e.is_revealed ? 'revealed' : 'locked'}">
+          <div class="entry-top">
+            <div class="entry-title">${escHtml(e.title)}</div>
+            <div class="entry-badges">
+              <span class="${pClass}">${e.priority}</span>
+              <span class="badge ${e.is_revealed ? 'badge-revealed' : 'badge-locked'}">${e.is_revealed ? '✅ Open' : '🔒 Locked'}</span>
+            </div>
+          </div>
+          ${contentEl}
+          <div class="entry-meta">
+            <div class="entry-meta-left">
+              <span class="meta-item">📅 ${createdDate}</span>
+              <span class="meta-item">👤 ${addrShort}</span>
+              <span class="tag-pill">#${escHtml(e.tag)}</span>
+            </div>
+            <button class="btn-delete" onclick="askDelete(${e.id})">Destroy</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function updateStats() {
+    const now = Math.floor(Date.now() / 1000);
+    const entries = loadEntries();
+    const total    = entries.length;
+    const revealed = entries.filter(e => e.unlock_at === 0 || now >= e.unlock_at).length;
+    const locked   = total - revealed;
+
+    document.getElementById('stat-total').textContent    = total;
+    document.getElementById('stat-locked').textContent   = locked;
+    document.getElementById('stat-revealed').textContent = revealed;
+  }
+
+  // ── TOAST ──
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    setTimeout(() => { t.className = ''; }, 3000);
+  }
+
+  // ── COPY CONTRACT ──
+  function copyContract() {
+    navigator.clipboard.writeText(CONTRACT);
+    showToast('Contract address copied!', 'success');
+  }
+
+  // ── UTILS ──
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── INIT ──
+  renderVault();
+  updateStats();
+  setInterval(() => { renderVault(); updateStats(); }, 30000); // refresh every 30s
+</script>
+
+</body>
+</html>
